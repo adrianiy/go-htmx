@@ -1,0 +1,28 @@
+{{ block "main" . }}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GoLang + HTMX</title>
+    <!-- Load Tailwind -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="w-full flex row">
+      <div class="h-full">
+        <header>
+          <div class="flex">
+            <a href="/" class="p-4">
+              UiRunner
+            </a>
+          </div>
+          <div class="flex">
+            {{ template "endpoints" . }}
+        </header>
+      </div>
+      <div class="h-full content p-4">
+        Content
+      </div>
+    </div>
+  </body>
+</html>
+{{ end }}

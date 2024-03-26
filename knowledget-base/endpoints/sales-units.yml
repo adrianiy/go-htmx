@@ -1,0 +1,186 @@
+version: 0
+name: salesByUnits
+description: Sales by units
+path: sales/units
+nodes:
+  - node: filtered_articles
+    sql: | 
+        SELECT 
+            cod_brand,
+            cod_article,
+            cod_family,
+            cod_subfamily,
+            cod_buyer
+        FROM 
+            articles__v0
+        WHERE 1 
+            {% if defined(cod_brand) or defined(cod_family) or defined(cod_buyer) or defined(cod_subfamily) or defined(cod_section) or defined(cod_product) or defined(cod_campaign)%}
+                AND {{sql_and(
+                        cod_brand__in=Array(cod_brand, 'Int8', defined=False),
+                        cod_family__in=Array(cod_family, 'Int', defined=False),
+                        cod_subfamily__in=Array(cod_subfamily, 'Int', defined=False),
+                        cod_buyer__in=Array(cod_buyer, 'Int', defined=False),
+                        cod_section__in=Array(cod_section, 'Int8', defined=False),
+                        cod_product__in=Array(cod_product, 'Int8', defined=False),
+                        cod_campaign__in=Array(cod_campaign, 'Int8', defined=False),
+                    )}}
+            {% endif %}
+
+  - node: by_day
+    sql: |
+      {% if not defined(date_start) or not defined(date_end) or not defined(cod_brand)%}
+          {{error("date_start and date_end query and cod_brand params are mandatory")}}
+      {% endif %}
+
+      {% set use_simple_views = 0  %}
+          {% if not(
+              defined(cod_family) or
+              defined(cod_subfamily) or
+              defined(cod_buyer)
+              )
+      %}
+        {% set use_simple_views = 1 %}
+      {% endif %}
+
+      SELECT
+          cod_brand,
+          cod_market,      
+          {% if use_simple_views == 0 %}
+              cod_article,
+          {% endif %}
+          units_net,
+          amount_net,
+          units_gross,
+          amount_gross,
+          units_return,
+          amount_return
+      FROM 
+          {% if use_simple_views == 1 %}
+              sales_rank_aggr_day__v0
+          {% else %}
+              sales_rank_aggr_article_day__v0
+          {% endif %}     
+      WHERE
+        date between toDate({{Date(date_start)}}) and toDate({{Date(date_end)}})
+        and not date between
+                addMonths(
+                    toStartOfMonth(toDate({{Date(date_start)}})),
+                    if(toStartOfMonth(toDate({{Date(date_start)}})) = toDate({{Date(date_start)}}), 0, 1)
+                )
+                and
+                addMonths(
+                    toStartOfMonth(toDate({{Date(date_end)}})),
+                    if(toStartOfMonth(toDate({{Date(date_end)}})) = toStartOfMonth(toDate({{Date(date_end)}}) + 1), 0, 1)
+                ) - 1
+        {% if defined(cod_market) or defined(cod_store) or defined(cod_brand) or defined(campaign_period) or defined(is_promotion) or defined(cod_sale_subtype) %}
+            and {{sql_and(
+                    cod_brand__in=Array(cod_brand, 'Int8'),
+                    cod_market__in=Array(cod_market, 'Int8', defined=False),
+                    cod_store__in=Array(cod_store, 'Int8', defined=False),
+                    cod_sale_subtype__in=Array(cod_sale_subtype, 'Int8', defined=False),
+                    is_promotion__in=Array(is_promotion, 'Int8', defined=False),
+                    campaign_period__in=Array(campaign_period, 'Int8', defined=False),
+                ) }}   
+        {% endif %}
+        {% if use_simple_views == 1 and ( defined(cod_section) or defined(cod_product) or defined(cod_campaign)) %}
+            and {{sql_and(
+                    cod_section__in=Array(cod_section, 'Int8', defined=False),
+                    cod_product__in=Array(cod_product, 'Int8', defined=False),
+                    cod_campaign__in=Array(cod_campaign, 'Int8', defined=False),
+                ) }}   
+        {% endif %}
+        {% if defined(cod_family) or defined(cod_subfamily) or defined(cod_buyer) %}
+           and cod_article in 
+            (
+                SELECT cod_article
+                FROM filtered_articles
+            )
+        {% endif %}     
+
+  - node: by_month
+    sql: |        
+      {% set use_simple_views = 0  %}
+            {% if not(
+                defined(cod_family) or
+                defined(cod_subfamily) or
+                defined(cod_buyer)
+                )
+            %}
+                {% set use_simple_views = 1 %}
+        {% endif %}
+
+
+        SELECT
+            cod_brand,
+            cod_market,
+            {% if use_simple_views == 0 %}
+                cod_article,
+            {% endif %}     
+            units_net,
+            amount_net,
+            units_gross,
+            amount_gross,
+            units_return,
+            amount_return
+        FROM 
+            {% if use_simple_views == 1 %}
+                sales_rank_aggr_month__v0
+            {% else %}
+                sales_rank_aggr_article_month__v0
+            {% endif %}   
+        WHERE
+            date between
+                addMonths(
+                        toStartOfMonth(toDate({{Date(date_start)}})),
+                        if(toStartOfMonth(toDate({{Date(date_start)}})) = toDate({{Date(date_start)}}), 0, 1)
+                    )
+                    and
+                    addMonths(
+                        toStartOfMonth(toDate({{Date(date_end)}})),
+                        if(toStartOfMonth(toDate({{Date(date_end)}})) = toStartOfMonth(toDate({{Date(date_end)}}) + 1), 0, 1)
+                    ) - 1 
+            {% if defined(cod_market) or defined(cod_store) or defined(cod_brand) or defined(campaign_period) or defined(is_promotion) or defined(cod_sale_subtype) or defined(cod_section) or defined(cod_product) or defined(cod_campaign) %}
+                and {{sql_and(
+                        cod_brand__in=Array(cod_brand, 'Int8', defined=False),
+                        cod_market__in=Array(cod_market, defined=False),
+                        cod_store__in=Array(cod_store, defined=False),
+                        cod_sale_subtype__in=Array(cod_sale_subtype, 'Int8', defined=False),
+                        is_promotion__in=Array(is_promotion, 'Int8', defined=False),
+                        campaign_period__in=Array(campaign_period, 'Int8', defined=False),
+                    ) }}   
+            {% endif %}
+            {% if use_simple_views == 1 and ( defined(cod_section) or defined(cod_product) or defined(cod_campaign)) %}
+                and {{sql_and(
+                        cod_section__in=Array(cod_section, 'Int8', defined=False),
+                        cod_product__in=Array(cod_product, 'Int8', defined=False),
+                        cod_campaign__in=Array(cod_campaign, 'Int8', defined=False),
+                    ) }}   
+            {% endif %}
+            {% if defined(cod_family) or defined(cod_subfamily) or defined(cod_buyer) %}
+            and cod_article in 
+                (
+                    SELECT cod_article
+                    FROM filtered_articles
+                )
+            {% endif %}               
+
+  - node: sales_units_amount_by_market
+    sql: |        
+      SELECT
+          cod_market, 
+          sum(amount_net) as amount_net,
+          sum(amount_gross) as amount_gross,
+          sum(amount_return) as amount_return,
+
+          sum(units_net) as units_net,
+          sum(units_gross) as units_gross,
+          sum(units_return) as units_return
+      FROM 
+          (
+                select * from by_day 
+                union all
+                select * from by_month
+            )    
+      group by
+          cod_market 
+  

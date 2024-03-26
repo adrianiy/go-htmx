@@ -1,0 +1,12 @@
+{{ block "endpoints" . }}
+<div class="endpoints p-4">
+  <h2 class="text-lg font-bold">Endpoints</h2>
+  <ul class="mt-2">
+    {{ range .Sidebar.Endpoints }}
+    <li class="py-2">
+      <a href="{{ .Path }}" class="text-blue-500 hover:underline" title="{{ .Description }}">{{ .Name }}</a>
+    </li>
+    {{ end }}
+  </ul>
+
+{{ end }}
