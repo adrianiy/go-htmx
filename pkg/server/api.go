@@ -34,7 +34,7 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 func New() Server {
 	Page := Page{
 		Title: "Go htmx",
-		Sidebar: endpoints.newSidebar(),
+		Sidebar: endpoints.NewSidebar(),
 	}
 	tmpl, err := template.ParseGlob("./templates/*.html")
 

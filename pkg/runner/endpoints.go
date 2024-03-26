@@ -11,7 +11,7 @@ import (
 const (
 	owner    = "adrianiy"
 	repo     = "go-htmx"
-	basePath = "/knowledge-base/endpoints"
+	basePath = "knowledge-base/endpoints"
 )
 
 var client = github.NewClient(nil)
@@ -35,7 +35,7 @@ func newEndpoint(path, name, description string) Endpoint {
 	return Endpoint{Id: id, Path: path, Name: name, Description: description}
 }
 
-func getEndpoints() []Endpoint {
+func GetEndpoints() []Endpoint {
 	_, dirContent, _, err := client.Repositories.GetContents(context.Background(), owner, repo, basePath, nil)
 
 	if err != nil {

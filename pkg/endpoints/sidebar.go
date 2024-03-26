@@ -8,8 +8,8 @@ type Sidebar struct {
 	Endpoints []runner.Endpoint
 }
 
-func newSidebar() Sidebar {
-	endpoints := runner.getEndpoints()
+func NewSidebar() Sidebar {
+	endpoints := runner.GetEndpoints()
 	
 	return Sidebar{
 		Endpoints: endpoints,
