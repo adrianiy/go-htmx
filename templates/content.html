@@ -1,0 +1,23 @@
+{{ block "content" . }} {{ if .Content }}
+<div>
+  <h1 class="text-2xl font-bold">{{ .Content.Name }}</h1>
+  <div class="mt-2 text-zinc-600">{{ .Content.Description }}</div>
+  {{ range .Content.Nodes }}
+    <div class="flex-col">
+      <span class="text-xs font-semibold text-violet-400">{{ .Node }}</span>
+      <div id="code-editor-{{ .Node }}" class="mt-2 rounded overflow-hidden code-editor">
+        {{ .Sql }}
+      </div>
+      <div class="mt-4 justify-between items-center flex">
+        <button class="text-xs text-zinc-600" _="on click toggle .expanded on #code-editor-{{ .Node }} then hide me then show next <button/>">Expand</span>
+        <button class="text-xs text-zinc-600" style="display: none" _="on click toggle .expanded on #code-editor-{{ .Node }} then hide me then show previous <button/>">Contract</span>
+        <button class="px-4 py-2 bg-violet-700 text-white rounded hover:bg-violet-800 flex items-center gap-x-2">
+          <span class="material-symbols-outlined">play_arrow</span>
+          Run
+        </button>
+      </div>
+      <div class="border-b border-zinc-900/10 my-8"></div>
+    </div>
+  {{ end }}
+</div>
+{{ end }} {{ end }}

@@ -5,6 +5,7 @@ go 1.22.1
 require (
 	github.com/google/go-github v17.0.0+incompatible // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/labstack/echo/v4 v4.11.4 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect

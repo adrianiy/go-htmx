@@ -1,12 +1,19 @@
 {{ block "endpoints" . }}
 <div class="endpoints p-4">
-  <h2 class="text-lg font-bold">Endpoints</h2>
+  <h2 class="text-xs font-semibold text-violet-400">Endpoints</h2>
   <ul class="mt-2">
     {{ range .Sidebar.Endpoints }}
-    <li class="py-2">
-      <a href="{{ .Path }}" class="text-blue-500 hover:underline" title="{{ .Description }}">{{ .Name }}</a>
+    <li class="py-2 text-sm">
+      <a
+        class="text-zinc-500 hover:text-zinc-900 cursor-pointer"
+        title="{{ .Description }}"
+        hx-get="/content/{{ .Id }}"
+        hx-target="#content"
+        hx-push-url="/endpoint/{{ .Id }}"
+        >{{ .Name }}</a
+      >
     </li>
     {{ end }}
   </ul>
-
+</div>
 {{ end }}

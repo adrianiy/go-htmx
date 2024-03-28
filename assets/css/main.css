@@ -1,0 +1,11 @@
+.CodeMirror {
+  height: auto;
+}
+
+.code-editor {
+  height: 300px;
+}
+
+.code-editor.expanded {
+  height: min-content;
+}
